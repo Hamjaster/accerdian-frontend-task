@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { IoIosClose } from "react-icons/io";
+import { useState } from "react";
 
 const style = {
   position: "absolute" as "absolute",
@@ -24,6 +25,45 @@ type Props = {
 };
 
 export default function PopupModal({ open, handleOpen, handleClose }: Props) {
+  const [referrerName, setReferrerName] = useState("");
+  const [referrerEmail, setReferrerEmail] = useState("");
+  const [friendName, setFriendName] = useState("");
+  const [friendEmail, setFriendEmail] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const referralData = {
+      referrerName,
+      referrerEmail,
+      friendName,
+      friendEmail,
+    };
+
+    try {
+      const response = await fetch(
+        "https://accerdian-backend-task.vercel.app/api/referrals/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(referralData),
+        }
+      );
+
+      if (response.ok) {
+        alert("Referral submitted successfully");
+        handleClose();
+      } else {
+        alert("Failed to submit referral");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while submitting the referral");
+    }
+  };
+
   return (
     <div>
       <Modal
@@ -41,11 +81,13 @@ export default function PopupModal({ open, handleOpen, handleClose }: Props) {
               <IoIosClose />
             </div>
             <h2 className="text-2xl font-bold mb-4">Refer a Course</h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium">Your Name</label>
                 <input
                   type="text"
+                  value={referrerName}
+                  onChange={(e) => setReferrerName(e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
                   required
                 />
@@ -54,6 +96,8 @@ export default function PopupModal({ open, handleOpen, handleClose }: Props) {
                 <label className="block text-sm font-medium">Your Email</label>
                 <input
                   type="email"
+                  value={referrerEmail}
+                  onChange={(e) => setReferrerEmail(e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
                   required
                 />
@@ -64,6 +108,8 @@ export default function PopupModal({ open, handleOpen, handleClose }: Props) {
                 </label>
                 <input
                   type="text"
+                  value={friendName}
+                  onChange={(e) => setFriendName(e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
                   required
                 />
@@ -74,6 +120,8 @@ export default function PopupModal({ open, handleOpen, handleClose }: Props) {
                 </label>
                 <input
                   type="email"
+                  value={friendEmail}
+                  onChange={(e) => setFriendEmail(e.target.value)}
                   className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
                   required
                 />
